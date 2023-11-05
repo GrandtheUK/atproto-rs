@@ -14,6 +14,22 @@ struct LoginRes {
 }
 
 #[derive(Serialize,Deserialize,Debug)]
+struct Create {
+    handle: String,
+    email: String,
+    password: String,
+    inviteCode:String
+}
+
+#[derive(Serialize,Deserialize,Debug)]
+struct CreateRes {
+    handle: String,
+    did: String,
+    accessJwt: String,
+    refreshJwt:String
+}
+
+#[derive(Serialize,Deserialize,Debug)]
 struct PostRes {
     uri: String,
     cid: String
@@ -56,6 +72,36 @@ impl Default for ATP {
 }
 
 impl ATP {
+    fn create_account(mut self, identifier:String, password:String, email:String, inviteCode:String) -> Result<String>{
+        let body = Create {
+            handle: identifier,
+            email: email,
+            password: password,
+            inviteCode: inviteCode
+        };
+        let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.server.createAccount";
+
+        let res = reqwest::blocking::Client::new()
+            .post(url)
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .unwrap();
+        let res_json: CreateRes;
+        match res.json::<CreateRes>() {
+            Ok(json) => {
+                res_json = json;
+            }
+            Err(e) => {
+                println!("Response was not ok: {}", e);
+                return Err(e);
+            }
+        }
+        self.jwt = res_json.accessJwt;
+        self.did = res_json.did;
+        Ok("".to_string())
+    }
+
     fn login(&mut self,identifier: String, password: String) -> Result<String> {
         let body = Login {
             identifier: identifier,
