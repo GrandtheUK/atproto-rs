@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.31"
+eframe = "0.23.0"
+egui = "0.23.0"
 reqwest = { version = "0.11", features = ["blocking","json"]}
 scanpw = "1.0.0"
 serde = { version = "1.0.190", features = ["derive"] }
