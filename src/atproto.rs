@@ -13,6 +13,16 @@ struct LoginRes {
     refreshJwt: String
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct InviteCode {
+    useCount: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct InviteCodeRes {
+    code: String,
+}
+
 #[derive(Serialize,Deserialize,Debug)]
 struct Create {
     handle: String,
@@ -77,6 +87,32 @@ impl ATP {
             base_url: base_url.to_string(),
             ..Default::default()
         }
+    }
+
+    pub fn create_invite_code(mut self, admin_username: String, admin_password: String, use_count: u32) -> Result<String> {
+        let body = InviteCode {
+            useCount: use_count,
+        };
+        let url = "".to_string()+&self.base_url+"/xrpc"+"com.atproto.server.createInviteCode";
+
+        let res = reqwest::blocking::Client::new()
+            .post(url)
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .basic_auth(admin_username, admin_password)
+            .send()
+            .unwrap();
+
+        let res_json:InviteCodeRes;
+        match res.json::<InviteCodeRes>() {
+            Ok(json) => {
+                res_json = json;
+            },
+            Err(e) => {
+                return Err(e);
+            }
+        }
+        Ok(res_json.code)
     }
 
     pub fn create_account(mut self, identifier:String, password:String, email:String, inviteCode:String) -> Result<String>{
