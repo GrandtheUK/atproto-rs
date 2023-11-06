@@ -99,7 +99,7 @@ impl ATP {
             .post(url)
             .header("Content-Type", "application/json")
             .json(&body)
-            .basic_auth(admin_username, admin_password)
+            .basic_auth(admin_username, Some(admin_password))
             .send()
             .unwrap();
 
