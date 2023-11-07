@@ -8,7 +8,7 @@ name = "atproto_rs"
 path = "src/lib.rs"
 
 [[bin]]
-name = "atproto-rs-test"
+name = "atproto-rs-example"
 path = "src/bin.rs"
 
 [dependencies]
