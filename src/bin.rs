@@ -1,5 +1,4 @@
-mod atproto;
-use atproto::ATP;
+use atproto_rs::ATP;
 use eframe::egui;
 
 #[derive(Default)]
@@ -14,7 +13,6 @@ fn main() {
         initial_window_size: Some(egui::vec2(320.0,240.0)),
         ..Default::default()
     };
-    let base = String::from("https://bluesky.benradford.me/");
     // let mut atproto = ATP::new(&base);
     println!("Provider: {}",base);
 
