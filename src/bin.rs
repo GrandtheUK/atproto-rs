@@ -13,8 +13,6 @@ fn main() {
         initial_window_size: Some(egui::vec2(320.0,240.0)),
         ..Default::default()
     };
-    // let mut atproto = ATP::new(&base);
-    println!("Provider: {}",base);
 
     let mut provider = String::new();
     let mut identity = String::new();
