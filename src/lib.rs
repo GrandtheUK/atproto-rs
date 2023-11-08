@@ -41,7 +41,7 @@ impl ATP {
         }
     }
 
-    pub fn create_invite_code(self, admin_username: String, admin_password: String, use_count: u32) -> reqwest::Result<String> {
+    pub fn create_invite_code(self, admin_username: String, admin_password: String, use_count: u32) -> reqwest::Result<InviteCodeRes> {
         let body = InviteCode {
             useCount: use_count,
         };
@@ -64,7 +64,7 @@ impl ATP {
                 return Err(e);
             }
         }
-        Ok(res_json.code)
+        Ok(res_json)
     }
 
     pub fn create_account(mut self, identifier:String, password:String, email:String, invite_code:String) -> reqwest::Result<CreateAccountRes>{
@@ -97,7 +97,7 @@ impl ATP {
         Ok(res_json)
     }
 
-    pub fn login(&mut self,identifier: &String, password: String) -> reqwest::Result<String> {
+    pub fn login(&mut self,identifier: &String, password: String) -> reqwest::Result<LoginRes> {
         let body = Login {
             identifier: identifier.to_owned(),
             password: password
@@ -120,10 +120,10 @@ impl ATP {
                 return Err(e);
             }
         }
-        self.jwt = res_json.accessJwt;
-        self.refresh_jwt = res_json.refreshJwt;
-        self.did = res_json.did;
-        Ok("".to_string())
+        self.jwt = res_json.accessJwt.to_owned();
+        self.refresh_jwt = res_json.refreshJwt.to_owned();
+        self.did = res_json.did.to_owned();
+        Ok(res_json)
         
     }
 
