@@ -5,7 +5,8 @@ use request_body::{
     post::{Post, PostRes},
     login::{Login,LoginRes},
     invite::{InviteCode,InviteCodeRes},
-    account_create::{CreateAccount,CreateAccountRes}
+    account_create::{CreateAccount,CreateAccountRes},
+    refresh_session::RefreshSessionRes
 };
 use reqwest;
 use chrono::prelude::*;
@@ -16,7 +17,8 @@ pub struct ATP{
     base_url: String,
     pub identifier: String,
     did: String,
-    jwt: String
+    jwt: String,
+    refresh_jwt: String
 }
 
 impl Default for ATP {
@@ -25,7 +27,8 @@ impl Default for ATP {
             base_url: String::from("https://bsky.social/"),
             identifier: String::from(""),
             did: String::from(""),
-            jwt: String::from("")
+            jwt: String::from(""),
+            refresh_jwt: String::from("")
         }
     }
 }
@@ -64,7 +67,7 @@ impl ATP {
         Ok(res_json.code)
     }
 
-    pub fn create_account(mut self, identifier:String, password:String, email:String, invite_code:String) -> reqwest::Result<String>{
+    pub fn create_account(mut self, identifier:String, password:String, email:String, invite_code:String) -> reqwest::Result<CreateAccountRes>{
         let body = CreateAccount {
             handle: identifier,
             email: email,
@@ -89,9 +92,9 @@ impl ATP {
                 return Err(e);
             }
         }
-        self.jwt = res_json.accessJwt;
-        self.did = res_json.did;
-        Ok("".to_string())
+        self.jwt = res_json.accessJwt.to_owned();
+        self.did = res_json.did.to_owned();
+        Ok(res_json)
     }
 
     pub fn login(&mut self,identifier: &String, password: String) -> reqwest::Result<String> {
@@ -118,11 +121,36 @@ impl ATP {
             }
         }
         self.jwt = res_json.accessJwt;
+        self.refresh_jwt = res_json.refreshJwt;
         self.did = res_json.did;
         Ok("".to_string())
         
     }
 
+    pub fn refresh(&mut self) -> reqwest::Result<RefreshSessionRes>{
+        let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.server.refreshSession";
+
+        let res = reqwest::blocking::Client::new()
+            .post(url)
+            .header("Content-Type","application/json")
+            .bearer_auth(self.jwt())
+            .send()
+            .unwrap();
+        let res_json: RefreshSessionRes;
+
+        match res.json::<RefreshSessionRes>() {
+            Ok(json) => {
+                res_json = json;
+            },
+            Err(e) => {
+                return Err(e);
+            }
+        }
+        self.jwt = res_json.accessJwt.to_owned();
+        Ok(res_json)
+
+    }
+   
     pub fn post(&self, did: String, jwt: String, post_text: String) -> reqwest::Result<PostRes> {
         let now = Utc::now().to_rfc3339().to_string();
         let body = Post {
