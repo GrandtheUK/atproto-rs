@@ -1,6 +1,7 @@
 use serde::{Deserialize,Serialize};
 
 #[derive(Serialize,Deserialize,Debug)]
+#[allow(non_snake_case)]
 pub struct CreateAccount {
     pub handle: String,
     pub email: String,
@@ -9,6 +10,7 @@ pub struct CreateAccount {
 }
 
 #[derive(Serialize,Deserialize,Debug)]
+#[allow(non_snake_case)]
 pub struct CreateAccountRes {
     pub handle: String,
     pub did: String,
