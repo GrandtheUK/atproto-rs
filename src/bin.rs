@@ -67,11 +67,16 @@ impl eframe::App for BlueskyClient {
                 }
             } else {
                 if ui.button("Login").clicked() {
-                    let provider: String;
-                    if !self.provider.ends_with("/") {
-                        provider = "".to_owned()+&self.provider +"/";
+                    let mut provider: String;
+                    if !self.provider.starts_with("https://") {
+                        provider = "".to_owned()+"https://"+&self.provider;
                     } else {
-                        provider = self.provider().to_owned();
+                        provider = "".to_owned()+&self.provider;
+                    }
+                    if !self.provider.ends_with("/") {
+                        provider = "".to_owned()+&provider +"/";
+                    } else {
+                        provider = "".to_owned()+&provider;
                     }
                     self.atproto = ATP::new(&provider);
                     match self.atproto.login(&self.identity, self.password.to_string()) {
