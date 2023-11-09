@@ -1,5 +1,6 @@
 mod request_body;
 
+use egui::Response;
 use request_body::{
     record::Record,
     post::{Post, PostRes},
@@ -48,13 +49,17 @@ impl ATP {
         };
         let url = "".to_string()+&self.base_url+"/xrpc"+"com.atproto.server.createInviteCode";
 
-        let res = reqwest::blocking::Client::new()
+        let request = reqwest::blocking::Client::new()
             .post(url)
             .header("Content-Type", "application/json")
             .json(&body)
             .basic_auth(admin_username, Some(admin_password))
-            .send()
-            .unwrap();
+            .send();
+        let res:reqwest::blocking::Response;
+        match request {
+            Ok(response) => res = response,
+            Err(e) => return Err(e)
+        }
 
         let res_json:InviteCodeRes;
         match res.json::<InviteCodeRes>() {
