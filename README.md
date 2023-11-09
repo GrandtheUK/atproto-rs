@@ -11,6 +11,7 @@ A rust crate to connect to a bluesky PDS and utilise the Authenticated Transfer 
         - refreshSession (ATP.refresh)
     - repo
         - createRecord (ATP.post)
+    - identity
         - resolveHandle (ATP.resolveHandle)
 
 `Note: ATP.post is specifically for a bluesky post. Replies and reposts are not currently supported but planned.`
