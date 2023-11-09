@@ -77,12 +77,17 @@ impl ATP {
         };
         let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.server.createAccount";
 
-        let res = reqwest::blocking::Client::new()
+        let request = reqwest::blocking::Client::new()
             .post(url)
             .header("Content-Type", "application/json")
             .json(&body)
-            .send()
-            .unwrap();
+            .send();
+        let res:reqwest::blocking::Response;
+        match request {
+            Ok(response) => res = response,
+            Err(e) => return Err(e)
+        }
+
         let res_json: CreateAccountRes;
         match res.json::<CreateAccountRes>() {
             Ok(json) => {
