@@ -1,6 +1,5 @@
 mod request_body;
 
-use egui::Response;
 use request_body::{
     record::Record,
     post::{Post, PostRes},
