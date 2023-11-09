@@ -194,13 +194,19 @@ impl ATP {
 
         let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.identity.resolveHandle";
 
-        let res = reqwest::blocking::Client::new()
+        let request = reqwest::blocking::Client::new()
             .post(url)
             .header("Content-Type", "application/json")
             .json(&body)
-            .send()
-            .unwrap();
+            .send();
+
+        let res: reqwest::blocking::Response;
         let res_json: ResolveHandleRes;
+        match request {
+            Ok(req) => res = req,
+            Err(e) => return Err(e)
+        }
+        
 
         match res.json::<ResolveHandleRes>() {
             Ok(json) => res_json = json,
