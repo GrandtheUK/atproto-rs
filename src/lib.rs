@@ -6,7 +6,8 @@ use request_body::{
     login::{Login,LoginRes},
     invite::{InviteCode,InviteCodeRes},
     account_create::{CreateAccount,CreateAccountRes},
-    refresh_session::RefreshSessionRes
+    refresh_session::RefreshSessionRes,
+    resolve::{ResolveHandle,ResolveHandleRes}
 };
 use reqwest;
 use chrono::prelude::*;
@@ -172,6 +173,7 @@ impl ATP {
             .json(&body)
             .send()
             .unwrap();
+
         let _res_json: PostRes;
         match res.json::<PostRes>() {
             Ok(json) => {
@@ -183,5 +185,27 @@ impl ATP {
             }
             
         }
+    }
+
+    pub fn resolvehandle(&self, handle: String) -> reqwest::Result<String> {
+        let body = ResolveHandle {
+            handle: handle
+        };
+
+        let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.identity.resolveHandle";
+
+        let res = reqwest::blocking::Client::new()
+            .post(url)
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .unwrap();
+        let res_json: ResolveHandleRes;
+
+        match res.json::<ResolveHandleRes>() {
+            Ok(json) => res_json = json,
+            Err(e) => return Err(e)
+        }
+        Ok(res_json.did)
     }
 }
