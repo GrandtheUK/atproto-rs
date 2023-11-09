@@ -166,13 +166,18 @@ impl ATP {
 
         let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.repo.createRecord";
 
-        let res = reqwest::blocking::Client::new()
+        let request = reqwest::blocking::Client::new()
             .post(url)
             .header("Content-Type", "application/json")
             .bearer_auth(jwt)
             .json(&body)
-            .send()
-            .unwrap();
+            .send();
+
+        let res: reqwest::blocking::Response;
+        match request {
+            Ok(response) => res = response,
+            Err(e) => return Err(e)
+        }
 
         let _res_json: PostRes;
         match res.json::<PostRes>() {
@@ -183,7 +188,6 @@ impl ATP {
                 println!("Post Error: {}", e);
                 Err(e)
             }
-            
         }
     }
 
@@ -201,7 +205,6 @@ impl ATP {
             .send();
 
         let res: reqwest::blocking::Response;
-        let res_json: ResolveHandleRes;
         match request {
             Ok(req) => res = req,
             Err(e) => return Err(e)
@@ -209,9 +212,9 @@ impl ATP {
         
 
         match res.json::<ResolveHandleRes>() {
-            Ok(json) => res_json = json,
+            Ok(json) => Ok(json.did),
             Err(e) => return Err(e)
         }
-        Ok(res_json.did)
+        // Ok(res_json.did)
     }
 }
