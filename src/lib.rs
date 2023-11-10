@@ -7,7 +7,8 @@ use request_body::{
     invite::{InviteCode,InviteCodeRes},
     account_create::{CreateAccount,CreateAccountRes},
     refresh_session::RefreshSessionRes,
-    resolve::{ResolveHandle,ResolveHandleRes}
+    resolve::{ResolveHandle,ResolveHandleRes},
+    app_password::{AppSpecificPassword,AppSpecificPasswordRes}
 };
 use reqwest;
 use chrono::prelude::*;
@@ -41,6 +42,8 @@ impl ATP {
             ..Default::default()
         }
     }
+    
+    // com.atproto.server
 
     pub fn create_invite_code(self, admin_username: String, admin_password: String, use_count: u32) -> reqwest::Result<InviteCodeRes> {
         let body = InviteCode {
@@ -171,7 +174,34 @@ impl ATP {
         Ok(res_json)
 
     }
-   
+    
+    pub fn create_app_password(&mut self, name: String) -> reqwest::Result<AppSpecificPasswordRes>{
+        let body = AppSpecificPassword {
+            name: name
+        };
+        let url = "".to_string()+&self.base_url+"xrpc/"+"com.atproto.server.refreshSession";
+
+        let request = reqwest::blocking::Client::new()
+            .post(url)
+            .header("Content-Type", "application/json")
+            .bearer_auth(self.jwt())
+            .json(&body)
+            .send();
+
+        let res: reqwest::blocking::Response;
+
+        match request {
+            Ok(response) => res = response,
+            Err(e) => return Err(e)
+        }
+        match res.json::<AppSpecificPasswordRes>() {
+            Ok(json) => Ok(json),
+            Err(e) => Err(e)
+        }
+    }
+
+    // com.atproto.repo
+
     pub fn post(&self, did: String, jwt: String, post_text: String) -> reqwest::Result<PostRes> {
         let now = Utc::now().to_rfc3339().to_string();
         let body = Post {
@@ -210,6 +240,8 @@ impl ATP {
             }
         }
     }
+    
+    // com.atproto.identity
 
     pub fn resolvehandle(&self, handle: String) -> reqwest::Result<String> {
         let body = ResolveHandle {
@@ -237,4 +269,6 @@ impl ATP {
         }
         // Ok(res_json.did)
     }
+
+
 }
