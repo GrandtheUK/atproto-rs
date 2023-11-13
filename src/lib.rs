@@ -231,14 +231,10 @@ impl ATP {
 
         let _res_json: PostRes;
         match res.json::<PostRes>() {
-            Ok(json) => {
-                Ok(json)
-            }
-            Err(e) => {
-                println!("Post Error: {}", e);
-                Err(e)
-            }
+            Ok(json) => Ok(json),
+            Err(e) => Err(e)
         }
+        
     }
     
     // com.atproto.identity
